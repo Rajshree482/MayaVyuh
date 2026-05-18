@@ -495,7 +495,7 @@ const GeminiUI = ({ forbiddenWords, onSelect, timerDuration, isRefining, imagesT
         position:"absolute", inset:0,
         backgroundImage:`url(${bgImage || bg3})`,
         backgroundSize:"cover", backgroundPosition:"center",
-        opacity:0.06, filter:"sepia(0.5) brightness(0.6)",
+        opacity:0.25, filter:"sepia(0.5) brightness(0.6)",
         zIndex:0, pointerEvents:"none"
       }}/>
       {showTooltip && (
