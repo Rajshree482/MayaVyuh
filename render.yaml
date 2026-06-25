@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: mayavyuh-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: AI_SERVICE_URL
+        sync: false

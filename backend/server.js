@@ -110,7 +110,8 @@ app.delete('/api/admin/images/:id', async (req, res) => {
 app.post('/api/similarity', async (req, res) => {
   try {
     const { original_url, submitted_url } = req.body;
-    const response = await fetch('http://localhost:8000/api/similarity', {
+    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+    const response = await fetch(`${aiServiceUrl}/api/similarity`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ original_url, submitted_url })
