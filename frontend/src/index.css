@@ -1,0 +1,75 @@
+/* MayaVyuh — Global Reset
+   Overrides the Vite starter index.css completely.
+   All component-level styles live in GlobalStyles (App.jsx → AdminComponents.jsx).
+*/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  color-scheme: dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  background: #04050a;
+  color: #e8dcc8;
+  overflow-x: hidden;
+}
+
+/* Vite default injects a centred #root — override it */
+#root {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  text-align: left;
+  border: none;
+  min-height: 100svh;
+  display: block;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #080c14; }
+::-webkit-scrollbar-thumb { background: #c8920a; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #f5b800; }
+
+/* Focus ring — keep accessible but styled */
+:focus-visible {
+  outline: 2px solid rgba(200, 146, 10, 0.6);
+  outline-offset: 2px;
+}
+
+/* Remove default button/input browser styling */
+button, input, select, textarea {
+  font-family: inherit;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Smooth image rendering */
+img {
+  display: block;
+  max-width: 100%;
+  image-rendering: auto;
+}
+
+/* Selection colour */
+::selection {
+  background: rgba(200, 146, 10, 0.25);
+  color: #f5b800;
+}
