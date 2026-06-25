@@ -7,6 +7,9 @@ import gdgLogo from "./assets/gdg-logo.png";
 const INIT_TEAMS = [];
 const INIT_EVENT = { started: false, phase: "lobby" };
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+
+
 function usePersistentState(key, initialValue) {
   const [value, setValue] = useState(() => {
     try {
@@ -148,7 +151,7 @@ const RoundDisplay = ({ playerLabel, targetImage, onComplete, roundLabel, storag
     setGenerating(true);
 
     try {
-      const res = await fetch("http://localhost:5001/api/generate", {
+      const res = await fetch(`${API_URL}/api/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: currentPrompt })
@@ -351,7 +354,7 @@ const PlayerSection = ({ globalTeams, setGlobalTeams, eventState }) => {
     if (!myTeam) return;
     const fetchSession = async () => {
       try {
-        const res = await fetch('http://localhost:5001/api/game/status');
+        const res = await fetch(`${API_URL}/api/game/status`);
         const data = await res.json();
         if (data.session) setSession(data.session);
       } catch (err) {}
@@ -368,7 +371,7 @@ const PlayerSection = ({ globalTeams, setGlobalTeams, eventState }) => {
       setPhase("lobby");
     }
     else if (s === 'round1_active' && phase === 'lobby') {
-      fetch("http://localhost:5001/api/target-image")
+      fetch(`${API_URL}/api/target-image`)
         .then(r=>r.json())
         .then(d=>{ setTargetImage(d.url); setPhase("r1"); })
         .catch(e=>setPhase("r1"));
@@ -460,7 +463,7 @@ const PlayerSection = ({ globalTeams, setGlobalTeams, eventState }) => {
     setFinalImg(img); 
     setPhase("judgment"); 
     try {
-      const res = await fetch("http://localhost:5001/api/similarity", {
+      const res = await fetch(`${API_URL}/api/similarity`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ original_url: targetImage, submitted_url: img })
       });
