@@ -38,10 +38,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-let openai = null;
-if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'your_openai_api_key_here') {
-  openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-}
+// OpenAI removed, using Hugging Face Inference API
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -154,23 +151,27 @@ app.post('/api/generate', async (req, res) => {
     const { prompt } = req.body;
     if (!prompt) return res.status(400).json({ error: "Prompt is required" });
     
-    if (openai) {
-      const response = await openai.images.generate({
-        model: "dall-e-3",
-        prompt: prompt,
-        n: 1,
-        size: "1024x1024",
-      });
-      return res.json({ images: [response.data[0].url] });
-    }
-    
-    // Fallback since API key might be missing/invalid
-    const seed = Date.now();
-    const images = [`https://picsum.photos/seed/${seed}/1024/1024`];
-    res.json({ images });
+      console.log(`Generating image for prompt: "${prompt}" via Pollinations AI...`);
+      const seed = Math.floor(Math.random() * 1000000);
+      const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${seed}&width=1024&height=1024&nologo=true&model=flux`;
+      
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`Generation API Error: ${response.status}`);
+      }
+
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      
+      const filename = `${Date.now()}-gen.jpg`;
+      const filepath = path.join(uploadsDir, filename);
+      fs.writeFileSync(filepath, buffer);
+
+      return res.json({ images: [`/uploads/${filename}`] });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Image generation failed" });
+    console.error("Image generation error:", err);
+    res.status(500).json({ error: "Image generation failed: " + err.message });
   }
 });
 
