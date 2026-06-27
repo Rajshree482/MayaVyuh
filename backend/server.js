@@ -102,28 +102,15 @@ app.post('/api/admin/upload-image', upload.array('images'), async (req, res) => 
   }
 });
 
-app.post('/api/player/upload-submission', upload.single('image'), async (req, res) => {
+app.post('/api/upload', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ success: false, message: "No file uploaded" });
-    }
-
-    const { teamId, round } = req.body;
-    if (!teamId || !round) {
-      return res.status(400).json({ success: false, message: "teamId and round are required" });
-    }
-
-    const team = await Team.findById(teamId);
-    if (!team) {
-      return res.status(404).json({
-        success: false,
-        message: "Team not found"
-      });
+      return res.status(400).json({ error: "No file uploaded" });
     }
 
     const fileContent = req.file.buffer;
     const extension = req.file.originalname.split('.').pop().replace(/[^a-zA-Z0-9]/g, '');
-    const key = `submissions/${teamId}/${round}/${uuidv4()}.${extension}`;
+    const key = `submissions/temp/${uuidv4()}.${extension}`;
 
     const command = new PutObjectCommand({
       Bucket: process.env.AWS_S3_BUCKET_NAME,
@@ -136,26 +123,11 @@ app.post('/api/player/upload-submission', upload.single('image'), async (req, re
 
     const fullUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
 
-    const newSubmission = new Submission({
-      team: teamId,
-      round: round,
-      finalImageUrl: fullUrl,
-    });
-
-    await newSubmission.save();
-
-    res.json({
-      success: true,
-      url: fullUrl
-    });
+    res.json({ url: fullUrl });
 
   } catch (err) {
     console.error("Player S3 Upload Error:", err);
-    res.status(500).json({
-      success: false,
-      message: "Failed to upload image to S3",
-      error: err.message,
-    });
+    res.status(500).json({ error: "Failed to upload image to S3" });
   }
 });
 
