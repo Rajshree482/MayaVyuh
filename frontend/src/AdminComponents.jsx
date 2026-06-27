@@ -598,6 +598,16 @@ const ImageVaultSection = () => {
   const handleUpload = async (e) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
+
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+    for (let i = 0; i < files.length; i++) {
+      if (files[i].size > MAX_SIZE) {
+        alert(`File "${files[i].name}" exceeds the 5MB size limit!`);
+        e.target.value = null;
+        return;
+      }
+    }
+
     setLoading(true);
     const formData = new FormData();
     for (let i = 0; i < files.length; i++) {
