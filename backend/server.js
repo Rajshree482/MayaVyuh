@@ -1,4 +1,8 @@
 require('dotenv').config();
+const dns = require('dns');
+// Set DNS servers to Google's public DNS to resolve MongoDB Atlas SRV records reliably
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
