@@ -161,9 +161,9 @@ const RoundDisplay = ({ playerLabel, targetImage, onComplete, roundLabel, storag
     const formData = new FormData();
     formData.append("image", file);
     try {
-      const uploadRes = await fetch("http://localhost:5001/api/upload", { method: "POST", body: formData });
+      const uploadRes = await fetch("https://mayavyuh.onrender.com/api/upload", { method: "POST", body: formData });
       const { url } = await uploadRes.json();
-      setUploadedImgUrl("http://localhost:5001" + url);
+      setUploadedImgUrl("https://mayavyuh.onrender.com" + url);
     } catch (err) {
       console.error(err);
       alert("Failed to upload image. Please try again.");
@@ -179,7 +179,7 @@ const RoundDisplay = ({ playerLabel, targetImage, onComplete, roundLabel, storag
     }
     setVerifying(true);
     try {
-      const res = await fetch("http://localhost:5001/api/verify-gemini", {
+      const res = await fetch("https://mayavyuh.onrender.com/api/verify-gemini", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ link: geminiLink })
       });
@@ -415,7 +415,7 @@ const PlayerSection = ({ globalTeams, setGlobalTeams, eventState }) => {
     if (!myTeam) return;
     const fetchSession = async () => {
       try {
-        const res = await fetch('http://localhost:5001/api/game/status');
+        const res = await fetch('https://mayavyuh.onrender.com/api/game/status');
         const data = await res.json();
         if (data.session) setSession(data.session);
       } catch (err) {}
@@ -432,7 +432,7 @@ const PlayerSection = ({ globalTeams, setGlobalTeams, eventState }) => {
       setPhase("lobby");
     }
     else if (s === 'round1_active' && phase === 'lobby') {
-      fetch("http://localhost:5001/api/target-image")
+      fetch("https://mayavyuh.onrender.com/api/target-image")
         .then(r=>r.json())
         .then(d=>{ setTargetImage(d.url); setPhase("r1"); })
         .catch(e=>setPhase("r1"));
@@ -524,7 +524,7 @@ const PlayerSection = ({ globalTeams, setGlobalTeams, eventState }) => {
     setFinalImg(img); 
     setPhase("judgment"); 
     try {
-      const res = await fetch("http://localhost:5001/api/similarity", {
+      const res = await fetch("https://mayavyuh.onrender.com/api/similarity", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ original_url: targetImage, submitted_url: img })
       });
