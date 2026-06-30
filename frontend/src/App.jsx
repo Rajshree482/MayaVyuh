@@ -67,7 +67,7 @@ function useAntiCheat({ isPlayer, teamId, onDisqualify, isPaused, forceCloseWind
     }).catch(() => { }); // intentionally swallow errors — never disrupt gameplay
 
     // Trigger instant disqualification for critical offenses
-    if (type === "tab_switch" || type === "copy_attempt" || type === "screenshot_attempt") {
+    if (type === "copy_attempt" || type === "screenshot_attempt") {
       if (isActiveRound && onDisqualify) {
         onDisqualify(type);
       }
