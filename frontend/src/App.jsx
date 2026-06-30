@@ -648,7 +648,7 @@ const SelectionScreen = ({ imgR2, imgR3, onSelect }) => (
 );
 
 const JudgmentScreen = ({ originalImg, finalImg, score, onFinish }) => {
-  const [timeLeft, setTimeLeft] = useState(50);
+  const [timeLeft, setTimeLeft] = useState(5);
 
   useEffect(() => {
     if (timeLeft <= 0) {

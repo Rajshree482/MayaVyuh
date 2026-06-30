@@ -70,10 +70,14 @@ app.post('/api/admin/upload-image', upload.array('images'), async (req, res) => 
 
     const uploadedUrls = [];
 
+    const highestImage = await ImageBank.findOne().sort('-teamNumber');
+    let nextTeamNumber = highestImage && highestImage.teamNumber ? highestImage.teamNumber + 1 : 1;
+
     for (const file of req.files) {
       const fileContent = file.buffer;
       const extension = file.originalname.split('.').pop().replace(/[^a-zA-Z0-9]/g, '');
-      const key = `reference/${uuidv4()}.${extension}`;
+      const filename = `team_${nextTeamNumber}.${extension}`;
+      const key = `reference/${filename}`;
 
       const command = new PutObjectCommand({
         Bucket: process.env.AWS_S3_BUCKET_NAME,
@@ -87,8 +91,13 @@ app.post('/api/admin/upload-image', upload.array('images'), async (req, res) => 
       const fullUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
       uploadedUrls.push(fullUrl);
 
-      const newImage = new ImageBank({ url: fullUrl });
+      const newImage = new ImageBank({ 
+        url: fullUrl,
+        teamNumber: nextTeamNumber,
+        filename: filename
+      });
       await newImage.save();
+      nextTeamNumber++;
     }
 
     res.json({
@@ -194,7 +203,7 @@ app.get('/api/target-image', async (req, res) => {
 
     if (team) {
       if (currentRound === 1) {
-        const assignedImage = await ImageBank.findOne({ assignedTeam: team._id });
+        const assignedImage = await ImageBank.findOne({ teamNumber: team.teamNumber });
         if (assignedImage) targetUrl = assignedImage.url;
       } else if (currentRound === 2) {
         const submission = await Submission.findOne({ team: team._id, round: 1 });
@@ -204,20 +213,15 @@ app.get('/api/target-image', async (req, res) => {
         if (submission && submission.finalImageUrl) targetUrl = submission.finalImageUrl;
       }
       
-      if (!targetUrl) {
-        const assignedImage = await ImageBank.findOne({ assignedTeam: team._id });
+      if (!targetUrl && currentRound === 1) {
+        const assignedImage = await ImageBank.findOne({ teamNumber: team.teamNumber });
         if (assignedImage) targetUrl = assignedImage.url;
       }
     }
 
     if (!targetUrl) {
-      const images = await ImageBank.find();
-      if (images.length > 0) {
-        targetUrl = images[currentTargetIndex % images.length].url;
-        currentTargetIndex = (currentTargetIndex + 1) % images.length;
-      } else {
-        targetUrl = 'https://picsum.photos/seed/default/800/800';
-      }
+      // Fallback only if no specific image is found, but don't randomly assign anymore
+      targetUrl = 'https://picsum.photos/seed/default/800/800';
     }
 
     res.json({ url: targetUrl });

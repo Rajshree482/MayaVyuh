@@ -72,8 +72,12 @@ router.post('/teams/register', async (req, res) => {
     const observer = role === 'observer' ? player1 : player2;
     const creator = role === 'creator' ? player1 : player2;
 
+    const highestTeam = await Team.findOne().sort('-teamNumber');
+    const nextTeamNumber = highestTeam && highestTeam.teamNumber ? highestTeam.teamNumber + 1 : 1;
+
     const newTeam = new Team({
       name: teamName,
+      teamNumber: nextTeamNumber,
       observer,
       creator,
       sessionId: activeSession.sessionId,
@@ -119,10 +123,6 @@ router.post('/admin/start-event', async (req, res) => {
     for (let i = 0; i < teams.length; i++) {
       teams[i].status = 'active';
       await teams[i].save();
-      
-      images[i].assignedTeam = teams[i]._id;
-      images[i].used = true;
-      await images[i].save();
     }
 
     res.json({ success: true, session });

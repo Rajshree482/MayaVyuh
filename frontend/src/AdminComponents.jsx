@@ -642,7 +642,7 @@ const ImageVaultSection = () => {
         {images.map((img, i) => (
           <div key={img._id} style={{ position: "relative", height: 250, border: "1px solid rgba(212, 175, 55, 0.2)", borderRadius: 8, overflow: "hidden", background: "rgba(0,0,0,0.8)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <div style={{ position: "absolute", top: 12, left: 12, background: "rgba(0,0,0,0.9)", padding: "4px 12px", border: "1px solid rgba(212, 175, 55, 0.4)", color: "#D4AF37", fontSize: 10, letterSpacing: 2, zIndex: 10 }}>
-              ARTIFACT_{String(i + 1).padStart(2, '0')}
+              TEAM {img.teamNumber ? img.teamNumber : String(i + 1).padStart(2, '0')}
             </div>
             <button onClick={() => handleDelete(img._id)} className="btn-imperial-danger" style={{ position: "absolute", top: 12, right: 12, width: 32, height: 32, display: "flex", justifyContent: "center", alignItems: "center", fontSize: 16, zIndex: 10 }}>×</button>
             <img src={img.url} alt={`Artifact ${i}`} style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.8, transition: "opacity 0.3s" }} onMouseOver={e=>e.currentTarget.style.opacity=1} onMouseOut={e=>e.currentTarget.style.opacity=0.8} />

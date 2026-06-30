@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const teamSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
+  teamNumber: { type: Number, unique: true },
   observer: String,
   creator: String,
   round: { type: Number, default: 0 },
