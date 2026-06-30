@@ -311,11 +311,138 @@ const DisqualifiedScreen = ({ teamName, reason }) => {
   );
 };
 
+const ComplexInput = ({ icon: Icon, placeholder, value, setter, fieldId, activeInput, setActiveInput }) => {
+  const isFocused = activeInput === fieldId;
+  const isFilled = value.length > 0;
+
+  return (
+    <div style={{ position: "relative", marginBottom: "16px", width: "100%", display: "flex", justifyContent: "center" }}>
+
+      {/* Futuristic ornate input container with bevel */}
+      <div style={{
+        position: "relative",
+        width: "90%",
+        height: "54px",
+        background: isFocused ? "linear-gradient(90deg, rgba(212,175,55,0.15) 0%, rgba(10,10,12,0.97) 20%, rgba(10,10,12,0.97) 80%, rgba(212,175,55,0.15) 100%)" : "linear-gradient(180deg, rgba(20,20,20,0.9) 0%, rgba(5,5,5,0.98) 100%)",
+        clipPath: "polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px)",
+        border: "none",
+        transition: "all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1)",
+        display: "flex",
+        alignItems: "center",
+        boxShadow: isFocused
+          ? "0 0 0 1px rgba(212,175,55,0.6), 0 0 40px rgba(212,175,55,0.2), inset 0 1px 0 rgba(255,255,255,0.06)"
+          : "0 0 0 1px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.03)"
+      }}>
+        {/* Bevel Outline using inset clip-path */}
+        <div style={{
+          position: "absolute",
+          inset: "1px",
+          background: isFocused
+            ? "linear-gradient(180deg, rgba(25,22,10,0.98) 0%, rgba(5,5,5,0.99) 100%)"
+            : "linear-gradient(180deg, #151515 0%, #000 100%)",
+          clipPath: "polygon(13px 0, calc(100% - 13px) 0, 100% 13px, 100% calc(100% - 13px), calc(100% - 13px) 100%, 13px 100%, 0 calc(100% - 13px), 0 13px)",
+          transition: "all 0.5s",
+          zIndex: 0
+        }} />
+
+        {/* Top scan line on focus */}
+        {isFocused && (
+          <motion.div
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={{ scaleX: 1, opacity: 1 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            style={{
+              position: "absolute", top: 0, left: 0, right: 0, height: "1px",
+              background: "linear-gradient(90deg, transparent, #FFDF73, #D4AF37, #FFDF73, transparent)",
+              boxShadow: "0 0 12px rgba(255,223,115,0.9)",
+              transformOrigin: "left",
+              zIndex: 3
+            }}
+          />
+        )}
+        {/* Bottom scan line on focus */}
+        {isFocused && (
+          <motion.div
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={{ scaleX: 1, opacity: 1 }}
+            transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
+            style={{
+              position: "absolute", bottom: 0, left: 0, right: 0, height: "1px",
+              background: "linear-gradient(90deg, transparent, rgba(212,175,55,0.5), rgba(212,175,55,0.8), rgba(212,175,55,0.5), transparent)",
+              boxShadow: "0 0 6px rgba(212,175,55,0.5)",
+              transformOrigin: "right",
+              zIndex: 3
+            }}
+          />
+        )}
+
+        {/* Glowing Side Accents */}
+        <div style={{ position: "absolute", left: 0, top: "15%", bottom: "15%", width: "2px", background: isFocused ? "linear-gradient(180deg, transparent, #FFDF73, #D4AF37, transparent)" : "rgba(255,255,255,0.03)", boxShadow: isFocused ? "0 0 20px rgba(255,223,115,0.8)" : "none", transition: "all 0.5s ease", zIndex: 2 }} />
+        <div style={{ position: "absolute", right: 0, top: "15%", bottom: "15%", width: "2px", background: isFocused ? "linear-gradient(180deg, transparent, #FFDF73, #D4AF37, transparent)" : "rgba(255,255,255,0.03)", boxShadow: isFocused ? "0 0 20px rgba(255,223,115,0.8)" : "none", transition: "all 0.5s ease", zIndex: 2 }} />
+
+        <div style={{
+          padding: "0 16px",
+          display: "flex",
+          alignItems: "center",
+          borderRight: `1px solid ${isFocused ? 'rgba(212,175,55,0.6)' : 'rgba(255,255,255,0.05)'}`,
+          height: "70%",
+          transition: "all 0.4s",
+          zIndex: 2
+        }}>
+          <Icon size={18} color={isFocused ? "#FFDF73" : "rgba(255,255,255,0.2)"} style={{ filter: isFocused ? "drop-shadow(0 0 10px rgba(255,223,115,1))" : "none", transition: "all 0.4s" }} />
+        </div>
+
+        <div style={{ position: "relative", flex: 1, height: "100%", zIndex: 2 }}>
+          <div style={{
+            position: "absolute",
+            top: (isFocused || isFilled) ? "6px" : "19px",
+            left: "16px",
+            fontSize: (isFocused || isFilled) ? "9px" : "11px",
+            letterSpacing: "4px",
+            color: (isFocused || isFilled) ? "#FFDF73" : "rgba(255,255,255,0.25)",
+            textTransform: "uppercase",
+            fontFamily: "'Orbitron', sans-serif",
+            fontWeight: 600,
+            pointerEvents: "none",
+            transition: "all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)",
+            textShadow: (isFocused || isFilled) ? "0 0 8px rgba(255,223,115,0.6)" : "none"
+          }}>
+            {placeholder}
+          </div>
+
+          <input
+            value={value}
+            onChange={e => setter(e.target.value.toUpperCase())}
+            onFocus={() => setActiveInput(fieldId)}
+            onBlur={() => setActiveInput(null)}
+            required
+            style={{
+              width: "100%",
+              height: "100%",
+              background: "transparent",
+              border: "none",
+              color: "#fff",
+              padding: "18px 16px 0",
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: "14px",
+              fontWeight: 500,
+              letterSpacing: "3px",
+              outline: "none",
+              caretColor: "#FFDF73"
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const RegistrationScreen = ({ onRegister }) => {
   const [teamName, setTeamName] = useState("");
   const [p1, setP1] = useState("");
   const [p2, setP2] = useState("");
   const [registering, setRegistering] = useState(false);
+  const [activeInput, setActiveInput] = useState(null);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -351,70 +478,435 @@ const RegistrationScreen = ({ onRegister }) => {
   };
 
   return (
-    <div className="imperial-bg" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", width: "150vw", height: "150vh", background: "radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 50%)", animation: "pulse 4s infinite alternate" }} />
-      <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 800, height: 800, border: "1px dashed rgba(212, 175, 55, 0.1)", borderRadius: "50%", animation: "spin-slow 30s linear infinite" }} />
+    <div style={{
+      height: "100vh",
+      width: "100%",
+      position: "relative",
+      backgroundColor: "#030303",
+      backgroundImage: `url(${BG_IMAGES[0] || ''})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      overflow: "hidden"
+    }}>
+      {/* Deep cinematic vignette + golden center bloom */}
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(40,30,5,0.4) 0%, rgba(5,4,0,0.75) 55%, rgba(0,0,0,0.99) 100%)", zIndex: 1 }} />
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 35% 25% at 50% 50%, rgba(212,175,55,0.09) 0%, transparent 70%)", zIndex: 1 }} />
 
-      <div style={{ display: "flex", width: "100%", maxWidth: 1200, gap: 64, alignItems: "center", zIndex: 10, padding: 32 }}>
-        <div style={{ flex: 1, paddingRight: 40, animation: "float 6s ease-in-out infinite" }}>
-          <img src={gdgLogo} alt="GDG Logo" style={{ width: 120, marginBottom: 24, filter: "drop-shadow(0 0 20px rgba(212,175,55,0.4))", borderRadius: "50%", background: "rgba(255,255,255,0.05)", padding: 8 }} />
-          <div style={{ fontFamily: "'Cinzel', serif", color: "#D4AF37", letterSpacing: 8, marginBottom: 16, fontSize: 14 }}>⬡ PROJECT: MAYAVYUH ⬡</div>
-          <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: "5rem", lineHeight: 1.1, marginBottom: 20, color: "#fff", textShadow: "0 0 30px rgba(212,175,55,0.6)" }}>THE PROMPT WAR</div>
-          <div style={{ fontFamily: "'Cinzel', serif", color: "rgba(255,255,255,0.6)", fontSize: 18, maxWidth: 500, lineHeight: 1.8, letterSpacing: 2 }}>
-            Enter the labyrinth. Describe the vision. Generate the spell. Two minds, one prompt.
+      {/* Horizontal cinematic light streaks */}
+      {[12, 32, 50, 68, 85].map((top, i) => (
+        <motion.div
+          key={`streak-${i}`}
+          animate={{ scaleX: [0, 1, 0], opacity: [0, 0.14 - i * 0.015, 0] }}
+          transition={{ duration: 7 + i * 1.8, repeat: Infinity, ease: "easeInOut", delay: i * 3.2 + 0.5 }}
+          style={{
+            position: "absolute",
+            top: `${top}%`,
+            left: 0, right: 0,
+            height: "1px",
+            background: "linear-gradient(90deg, transparent, rgba(212,175,55,0.8), rgba(255,223,115,1), rgba(212,175,55,0.8), transparent)",
+            transformOrigin: i % 2 === 0 ? "left" : "right",
+            zIndex: 1,
+            pointerEvents: "none"
+          }}
+        />
+      ))}
+
+      {/* High-End Volumetric Sparks */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 2, pointerEvents: "none", overflow: "hidden" }}>
+        {[...Array(30)].map((_, i) => (
+          <motion.div
+            key={i}
+            animate={{
+              y: ["100vh", "-10vh"],
+              x: [Math.random() * 30 - 15, Math.random() * 60 - 30],
+              opacity: [0, Math.random() * 0.8 + 0.2, 0],
+              scale: [0, Math.random() * 1.5 + 0.5, 0]
+            }}
+            transition={{
+              duration: Math.random() * 8 + 8,
+              repeat: Infinity,
+              ease: "linear",
+              delay: Math.random() * 10
+            }}
+            style={{
+              position: "absolute",
+              left: `${Math.random() * 100}%`,
+              width: `${Math.random() * 3 + 1}px`,
+              height: `${Math.random() * 3 + 1}px`,
+              background: "linear-gradient(180deg, #FFFFFF 0%, #FFDF73 50%, #D4AF37 100%)",
+              borderRadius: "50%",
+              boxShadow: "0 0 20px #FFDF73, 0 0 5px #FFFFFF",
+              filter: "blur(0.5px)"
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Outer ring — slow rotation with bright arc */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 200, repeat: Infinity, ease: "linear" }}
+        style={{
+          position: "absolute",
+          width: "130vh", height: "130vh",
+          borderRadius: "50%",
+          border: "1px solid rgba(212,175,55,0.04)",
+          borderTop: "2px solid rgba(212,175,55,0.28)",
+          borderBottom: "1px solid rgba(212,175,55,0.1)",
+          zIndex: 1,
+          boxShadow: "0 0 80px rgba(212,175,55,0.07), inset 0 0 80px rgba(212,175,55,0.03)"
+        }}
+      />
+      {/* Middle counter-rotating ring */}
+      <motion.div
+        animate={{ rotate: -360 }}
+        transition={{ duration: 300, repeat: Infinity, ease: "linear" }}
+        style={{
+          position: "absolute",
+          width: "108vh", height: "108vh",
+          borderRadius: "50%",
+          border: "1px solid transparent",
+          borderLeft: "2px solid rgba(212,175,55,0.2)",
+          borderRight: "1px solid rgba(212,175,55,0.06)",
+          zIndex: 1
+        }}
+      />
+      {/* Inner pulsing ring */}
+      <motion.div
+        animate={{ scale: [1, 1.04, 1], opacity: [0.25, 0.6, 0.25] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          position: "absolute",
+          width: "86vh", height: "86vh",
+          borderRadius: "50%",
+          border: "1px solid rgba(212,175,55,0.18)",
+          zIndex: 1,
+          boxShadow: "0 0 50px rgba(212,175,55,0.08), inset 0 0 50px rgba(212,175,55,0.05)"
+        }}
+      />
+
+      <div style={{
+        position: "relative",
+        zIndex: 10,
+        width: "100%",
+        maxWidth: "950px",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "20px",
+        perspective: "1000px"
+      }}>
+
+        {/* Left Ornate Pillar (3D Metallic) */}
+        <motion.div
+          initial={{ opacity: 0, x: -80, rotateY: 15 }}
+          animate={{ opacity: 1, x: 0, rotateY: 0 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          style={{
+            width: "60px",
+            height: "450px",
+            background: "linear-gradient(90deg, #050505 0%, #2a2a2a 30%, #444 50%, #2a2a2a 70%, #050505 100%)",
+            clipPath: "polygon(20px 0, 40px 0, 60px 25px, 60px calc(100% - 25px), 40px 100%, 20px 100%, 0 calc(100% - 25px), 0 25px)",
+            position: "absolute",
+            left: "20px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "40px 0",
+            boxShadow: "20px 0 50px rgba(0,0,0,0.9)",
+            zIndex: 15
+          }}
+        >
+          {/* Inner Pillar Engraving */}
+          <div style={{ position: "absolute", inset: "2px", background: "linear-gradient(180deg, #0e0e0e 0%, #050505 100%)", clipPath: "polygon(19px 0, 39px 0, 58px 24px, 58px calc(100% - 24px), 39px 100%, 19px 100%, 0 calc(100% - 24px), 0 24px)", zIndex: 0 }} />
+          {/* Pillar inner glow line */}
+          <div style={{ position: "absolute", top: 0, bottom: 0, left: "50%", width: "1px", background: "linear-gradient(180deg, transparent, rgba(212,175,55,0.15), rgba(212,175,55,0.3), rgba(212,175,55,0.15), transparent)", transform: "translateX(-50%)", zIndex: 0 }} />
+          <motion.div animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} style={{ width: "2px", height: "80px", background: "linear-gradient(180deg, transparent, #FFDF73, #D4AF37, transparent)", zIndex: 1, boxShadow: "0 0 20px rgba(255,223,115,0.8)" }} />
+          <div style={{ writingMode: "vertical-rl", fontFamily: "'Cinzel', serif", color: "#D4AF37", letterSpacing: "10px", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", transform: "rotate(180deg)", zIndex: 1, textShadow: "0 0 15px rgba(212,175,55,0.7), 0 0 30px rgba(212,175,55,0.3)" }}>
+            Alpha
           </div>
-        </div>
+          <motion.div animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1.5 }} style={{ width: "2px", height: "80px", background: "linear-gradient(180deg, transparent, #FFDF73, #D4AF37, transparent)", zIndex: 1, boxShadow: "0 0 20px rgba(255,223,115,0.8)" }} />
+        </motion.div>
 
-        <motion.div style={{ flex: 1, maxWidth: 450 }} initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
-          <form onSubmit={handleRegister} className="imperial-glass imperial-panel" style={{ textAlign: "center", padding: "48px 40px", border: "1px solid rgba(212, 175, 55, 0.3)", boxShadow: "0 0 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(212, 175, 55, 0.1)" }}>
-            <Shield size={48} color="#D4AF37" style={{ margin: "0 auto", marginBottom: 24, filter: "drop-shadow(0 0 10px rgba(212,175,55,0.4))" }} />
-            <div className="imperial-gold-text" style={{ fontFamily: "'Cinzel', serif", fontSize: 24, marginBottom: 8, letterSpacing: 4 }}>TEAM ENLISTMENT</div>
-            <div style={{ color: "rgba(212, 175, 55, 0.5)", fontSize: 10, letterSpacing: 4, marginBottom: 32 }}>INITIATE DATACRON UPLINK</div>
+        {/* Right Ornate Pillar — Premium metallic */}
+        <motion.div
+          initial={{ opacity: 0, x: 100, rotateY: -25 }}
+          animate={{ opacity: 1, x: 0, rotateY: 0 }}
+          transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            width: "60px",
+            height: "450px",
+            background: "linear-gradient(90deg, #050505 0%, #1e1e1e 25%, #3a3a3a 50%, #1e1e1e 75%, #050505 100%)",
+            clipPath: "polygon(20px 0, 40px 0, 60px 25px, 60px calc(100% - 25px), 40px 100%, 20px 100%, 0 calc(100% - 25px), 0 25px)",
+            position: "absolute",
+            right: "20px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "40px 0",
+            boxShadow: "-20px 0 60px rgba(0,0,0,0.95), 0 0 40px rgba(212,175,55,0.08)",
+            zIndex: 15
+          }}
+        >
+          <div style={{ position: "absolute", inset: "2px", background: "linear-gradient(180deg, #0e0e0e 0%, #050505 100%)", clipPath: "polygon(19px 0, 39px 0, 58px 24px, 58px calc(100% - 24px), 39px 100%, 19px 100%, 0 calc(100% - 24px), 0 24px)", zIndex: 0 }} />
+          <div style={{ position: "absolute", top: 0, bottom: 0, left: "50%", width: "1px", background: "linear-gradient(180deg, transparent, rgba(212,175,55,0.15), rgba(212,175,55,0.3), rgba(212,175,55,0.15), transparent)", transform: "translateX(-50%)", zIndex: 0 }} />
+          <motion.div animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.8 }} style={{ width: "2px", height: "80px", background: "linear-gradient(180deg, transparent, #FFDF73, #D4AF37, transparent)", zIndex: 1, boxShadow: "0 0 20px rgba(255,223,115,0.8)" }} />
+          <div style={{ writingMode: "vertical-rl", fontFamily: "'Cinzel', serif", color: "#D4AF37", letterSpacing: "10px", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", zIndex: 1, textShadow: "0 0 15px rgba(212,175,55,0.7), 0 0 30px rgba(212,175,55,0.3)" }}>
+            Omega
+          </div>
+          <motion.div animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 2.3 }} style={{ width: "2px", height: "80px", background: "linear-gradient(180deg, transparent, #FFDF73, #D4AF37, transparent)", zIndex: 1, boxShadow: "0 0 20px rgba(255,223,115,0.8)" }} />
+        </motion.div>
 
-            <div style={{ position: "relative", marginBottom: 24 }}>
-              <Users size={16} color="#D4AF37" style={{ position: "absolute", top: 18, left: 20, opacity: 0.6 }} />
-              <input
-                placeholder="TEAM DESIGNATION"
-                value={teamName}
-                onChange={e => setTeamName(e.target.value.toUpperCase())}
-                required
-                style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212, 175, 55, 0.3)", padding: "16px 24px 16px 54px", color: "#D4AF37", fontSize: 14, outline: "none", letterSpacing: 4, fontFamily: "'Orbitron', sans-serif", transition: "all 0.3s" }}
-                onFocus={(e) => e.target.style.borderColor = "#D4AF37"}
-                onBlur={(e) => e.target.style.borderColor = "rgba(212, 175, 55, 0.3)"}
+        {/* Central Hexagonal Core Structure — no floating, stationary */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
+          style={{ position: "relative", width: "100%", maxWidth: "600px", zIndex: 10, display: "flex", justifyContent: "center" }}
+        >
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            style={{
+              position: "relative",
+              width: "100%",
+              background: "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDIiLz4KPC9zdmc+') repeat, linear-gradient(180deg, rgba(20,18,10,0.85) 0%, rgba(5,5,5,0.95) 100%)",
+              backdropFilter: "blur(30px) saturate(120%)",
+              WebkitBackdropFilter: "blur(30px) saturate(120%)",
+              clipPath: "polygon(45px 0, calc(100% - 45px) 0, 100% 45px, 100% calc(100% - 45px), calc(100% - 45px) 100%, 45px 100%, 0 calc(100% - 45px), 0 45px)",
+              padding: "60px 40px 40px",
+              boxShadow: "0 40px 120px rgba(0,0,0,1), inset 0 2px 0 rgba(255,255,255,0.1), inset 0 -2px 20px rgba(212,175,55,0.15)",
+            }}
+          >
+          {/* Animated Liquid Gold Vault Border */}
+          <motion.div 
+            animate={{ backgroundPosition: ["0% 0%", "200% 200%"] }}
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            style={{
+              position: "absolute", inset: "0",
+              background: "linear-gradient(135deg, #FFDF73 0%, #D4AF37 25%, #8a6a1c 50%, #D4AF37 75%, #FFDF73 100%)",
+              backgroundSize: "300% 300%",
+              clipPath: "polygon(45px 0, calc(100% - 45px) 0, 100% 45px, 100% calc(100% - 45px), calc(100% - 45px) 100%, 45px 100%, 0 calc(100% - 45px), 0 45px)",
+              zIndex: 0
+            }} 
+          />
+          <div style={{
+            position: "absolute", inset: "3px",
+            background: "linear-gradient(180deg, rgba(10,10,10,0.9) 0%, rgba(2,2,2,0.98) 100%)",
+            backdropFilter: "blur(10px)",
+            clipPath: "polygon(43px 0, calc(100% - 43px) 0, 100% 43px, 100% calc(100% - 43px), calc(100% - 43px) 100%, 43px 100%, 0 calc(100% - 43px), 0 43px)",
+            zIndex: 0
+          }} />
+          <div style={{
+            position: "absolute", inset: "10px",
+            border: "1px solid rgba(212,175,55,0.15)",
+            clipPath: "polygon(38px 0, calc(100% - 38px) 0, 100% 38px, 100% calc(100% - 38px), calc(100% - 38px) 100%, 38px 100%, 0 calc(100% - 38px), 0 38px)",
+            zIndex: 0
+          }} />
+
+          {/* 4 Golden Corner Accents */}
+          {[
+            { top: "12px", left: "12px", borderTop: "2px solid #FFDF73", borderLeft: "2px solid #FFDF73", boxShadow: "inset 0 0 10px rgba(255,223,115,0.4), -3px -3px 12px rgba(255,223,115,0.5)" },
+            { top: "12px", right: "12px", borderTop: "2px solid #FFDF73", borderRight: "2px solid #FFDF73", boxShadow: "inset 0 0 10px rgba(255,223,115,0.4), 3px -3px 12px rgba(255,223,115,0.5)" },
+            { bottom: "12px", left: "12px", borderBottom: "2px solid #FFDF73", borderLeft: "2px solid #FFDF73", boxShadow: "inset 0 0 10px rgba(255,223,115,0.4), -3px 3px 12px rgba(255,223,115,0.5)" },
+            { bottom: "12px", right: "12px", borderBottom: "2px solid #FFDF73", borderRight: "2px solid #FFDF73", boxShadow: "inset 0 0 10px rgba(255,223,115,0.4), 3px 3px 12px rgba(255,223,115,0.5)" }
+          ].map((style, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, ease: "easeOut", delay: 1.2 + i * 0.1 }}
+              style={{
+                position: "absolute",
+                width: "24px", height: "24px",
+                zIndex: 4,
+                ...style
+              }}
+            />
+          ))}
+
+          {/* Slow Ambient Scanner Sweep (horizontal line that sweeps top-to-bottom once) */}
+          <motion.div
+            initial={{ top: "10%", opacity: 0 }}
+            animate={{ top: ["10%", "90%", "10%"], opacity: [0, 0.6, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear", repeatDelay: 4 }}
+            style={{
+              position: "absolute", left: "10px", right: "10px", height: "1px",
+              background: "linear-gradient(90deg, transparent, rgba(212,175,55,0.8), rgba(255,223,115,1), rgba(212,175,55,0.8), transparent)",
+              boxShadow: "0 0 15px rgba(255,223,115,0.6)",
+              zIndex: 3,
+              pointerEvents: "none"
+            }}
+          />
+
+          {/* Pulsing amber ambient inner glow at bottom */}
+          <motion.div
+            animate={{ opacity: [0.3, 0.7, 0.3] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            style={{
+              position: "absolute", bottom: 0, left: 0, right: 0, height: "60px",
+              background: "radial-gradient(ellipse at 50% 100%, rgba(212,175,55,0.25) 0%, transparent 70%)",
+              zIndex: 3,
+              pointerEvents: "none"
+            }}
+          />
+
+          {/* Top Overlapping Royal Crest */}
+          <div style={{
+            position: "absolute",
+            top: "-20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "110px",
+            height: "70px",
+            background: "linear-gradient(180deg, #1a1a1a 0%, #050505 100%)",
+            clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 20,
+            boxShadow: "0 10px 20px rgba(0,0,0,1)"
+          }}>
+            {/* Crest Bevel */}
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, #D4AF37 0%, #664d0c 100%)", clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)", zIndex: 0 }} />
+            <div style={{ position: "absolute", inset: "2px", background: "#0a0a0a", clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)", zIndex: 0 }} />
+            <motion.img
+              src={gdgLogo} alt="GDG"
+              animate={{ filter: ["drop-shadow(0 0 10px rgba(212,175,55,0.5))", "drop-shadow(0 0 20px rgba(212,175,55,1))", "drop-shadow(0 0 10px rgba(212,175,55,0.5))"] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              style={{ width: 40, zIndex: 1, position: "relative" }}
+            />
+          </div>
+
+          <div style={{ position: "relative", zIndex: 5, textAlign: "center", marginTop: "10px", marginBottom: "24px" }}>
+            {/* Cinematic Lens Flare */}
+            <motion.div 
+              animate={{ opacity: [0.4, 0.8, 0.4], scaleX: [1, 1.5, 1] }} 
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "120%", height: "2px", background: "radial-gradient(ellipse at center, rgba(212,175,55,0.8) 0%, transparent 70%)", filter: "blur(2px)", zIndex: -1 }} 
+            />
+            <motion.div 
+              animate={{ opacity: [0.2, 0.5, 0.2], scale: [1, 1.2, 1] }} 
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+              style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "80%", height: "40px", background: "radial-gradient(ellipse at center, rgba(212,175,55,0.3) 0%, transparent 70%)", filter: "blur(10px)", zIndex: -1 }} 
+            />
+            
+            <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "10px", letterSpacing: "10px", color: "rgba(212,175,55,0.9)", textTransform: "uppercase", marginBottom: "8px", fontWeight: 700, textShadow: "0 0 10px rgba(212,175,55,0.4)" }}>
+              Sector Unlocked
+            </div>
+            <motion.h1 
+              initial={{ letterSpacing: "30px", opacity: 0, filter: "blur(10px)" }}
+              animate={{ letterSpacing: "10px", opacity: 1, filter: "blur(0px)" }}
+              transition={{ duration: 2, ease: "easeOut", delay: 0.5 }}
+              style={{ position: "relative", fontFamily: "'Cinzel', serif", fontSize: "44px", fontWeight: "900", color: "#fff", margin: 0, textShadow: "0 20px 40px rgba(0,0,0,0.8), 0 0 30px rgba(212,175,55,0.8)" }}
+            >
+              <span style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #FFDF73 30%, #D4AF37 60%, #8A6A1C 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", position: "relative", zIndex: 2 }}>MAYAVYUH</span>
+            </motion.h1>
+
+            {/* Highly Intricate Royal Divider */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", margin: "16px 0" }}>
+              <div style={{ width: "35%", height: "1px", background: "linear-gradient(90deg, transparent, rgba(212,175,55,1))" }} />
+              <div style={{ width: "8px", height: "8px", transform: "rotate(45deg)", border: "2px solid #D4AF37" }} />
+              <motion.div
+                animate={{ scale: [1, 1.2, 1], rotate: [45, 225] }} transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+                style={{ width: "5px", height: "5px", background: "#D4AF37", boxShadow: "0 0 20px #D4AF37" }}
               />
+              <div style={{ width: "8px", height: "8px", transform: "rotate(45deg)", border: "2px solid #D4AF37" }} />
+              <div style={{ width: "35%", height: "1px", background: "linear-gradient(270deg, transparent, rgba(212,175,55,1))" }} />
             </div>
 
-            <div style={{ position: "relative", marginBottom: 24 }}>
-              <User size={16} color="#D4AF37" style={{ position: "absolute", top: 18, left: 20, opacity: 0.6 }} />
-              <input
-                placeholder="OPERATIVE 01 NAME"
-                value={p1}
-                onChange={e => setP1(e.target.value.toUpperCase())}
-                required
-                style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212, 175, 55, 0.3)", padding: "16px 24px 16px 54px", color: "#D4AF37", fontSize: 14, outline: "none", letterSpacing: 4, fontFamily: "'Orbitron', sans-serif", transition: "all 0.3s" }}
-                onFocus={(e) => e.target.style.borderColor = "#D4AF37"}
-                onBlur={(e) => e.target.style.borderColor = "rgba(212, 175, 55, 0.3)"}
-              />
-            </div>
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: "12px", color: "rgba(255,255,255,0.5)", letterSpacing: "2px" }}>
+              Synchronize sequence to enter the labyrinth.
+            </p>
+          </div>
 
-            <div style={{ position: "relative", marginBottom: 40 }}>
-              <User size={16} color="#D4AF37" style={{ position: "absolute", top: 18, left: 20, opacity: 0.6 }} />
-              <input
-                placeholder="OPERATIVE 02 NAME"
-                value={p2}
-                onChange={e => setP2(e.target.value.toUpperCase())}
-                required
-                style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212, 175, 55, 0.3)", padding: "16px 24px 16px 54px", color: "#D4AF37", fontSize: 14, outline: "none", letterSpacing: 4, fontFamily: "'Orbitron', sans-serif", transition: "all 0.3s" }}
-                onFocus={(e) => e.target.style.borderColor = "#D4AF37"}
-                onBlur={(e) => e.target.style.borderColor = "rgba(212, 175, 55, 0.3)"}
-              />
-            </div>
+          <form onSubmit={handleRegister} style={{ position: "relative", zIndex: 5, width: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
 
-            <button type="submit" disabled={registering} className="btn-imperial" style={{ width: "100%", padding: 20, letterSpacing: 4, fontSize: 14, display: "flex", justifyContent: "center", alignItems: "center", gap: 12 }}>
-              {registering ? "ENLISTING..." : "INITIALIZE CONNECTION"} <Crosshair size={16} />
-            </button>
+            <motion.div initial={{ opacity: 0, x: -50, filter: "blur(10px)" }} animate={{ opacity: 1, x: 0, filter: "blur(0px)" }} transition={{ duration: 0.8, ease: "easeOut", delay: 1.0 }} style={{ width: "100%" }}>
+              <ComplexInput icon={Shield} placeholder="HOUSE DESIGNATION" value={teamName} setter={setTeamName} fieldId="team" activeInput={activeInput} setActiveInput={setActiveInput} />
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, x: 50, filter: "blur(10px)" }} animate={{ opacity: 1, x: 0, filter: "blur(0px)" }} transition={{ duration: 0.8, ease: "easeOut", delay: 1.2 }} style={{ width: "100%" }}>
+              <ComplexInput icon={User} placeholder="OPERATIVE I IDENTIFIER" value={p1} setter={setP1} fieldId="p1" activeInput={activeInput} setActiveInput={setActiveInput} />
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, x: -50, filter: "blur(10px)" }} animate={{ opacity: 1, x: 0, filter: "blur(0px)" }} transition={{ duration: 0.8, ease: "easeOut", delay: 1.4 }} style={{ width: "100%" }}>
+              <ComplexInput icon={Users} placeholder="OPERATIVE II IDENTIFIER" value={p2} setter={setP2} fieldId="p2" activeInput={activeInput} setActiveInput={setActiveInput} />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
+              style={{ width: "95%", marginTop: "12px" }}
+            >
+              <button
+                type="submit"
+                disabled={registering}
+                style={{
+                  width: "100%",
+                  height: "56px",
+                  background: "linear-gradient(90deg, rgba(212,175,55,0.2) 0%, rgba(255,223,115,0.5) 50%, rgba(212,175,55,0.2) 100%)",
+                  clipPath: "polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px)",
+                  border: "none",
+                  color: "#fff",
+                  fontFamily: "'Cinzel', serif",
+                  fontWeight: 900,
+                  fontSize: "16px",
+                  letterSpacing: "6px",
+                  cursor: registering ? "not-allowed" : "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "16px",
+                  transition: "all 0.5s cubic-bezier(0.19, 1, 0.22, 1)",
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(212,175,55,0.4), inset 0 0 20px rgba(255,223,115,0.2)",
+                  textTransform: "uppercase",
+                  position: "relative",
+                  overflow: "hidden"
+                }}
+                onMouseOver={(e) => {
+                  if (!registering) {
+                    e.currentTarget.style.background = "linear-gradient(90deg, rgba(255,223,115,0.6) 0%, rgba(255,255,255,0.9) 50%, rgba(255,223,115,0.6) 100%)";
+                    e.currentTarget.style.boxShadow = "0 15px 40px rgba(0,0,0,0.9), 0 0 60px rgba(255,223,115,0.8), inset 0 0 30px rgba(255,255,255,0.5)";
+                    e.currentTarget.style.transform = "scale(1.02) translateY(-2px)";
+                    if (e.currentTarget.children[0]) e.currentTarget.children[0].style.opacity = "0.2";
+                    e.currentTarget.style.textShadow = "0 0 15px rgba(255,255,255,1)";
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (!registering) {
+                    e.currentTarget.style.background = "linear-gradient(90deg, rgba(212,175,55,0.2) 0%, rgba(255,223,115,0.5) 50%, rgba(212,175,55,0.2) 100%)";
+                    e.currentTarget.style.boxShadow = "0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(212,175,55,0.4), inset 0 0 20px rgba(255,223,115,0.2)";
+                    e.currentTarget.style.transform = "scale(1) translateY(0)";
+                    if (e.currentTarget.children[0]) e.currentTarget.children[0].style.opacity = "0.9";
+                    e.currentTarget.style.textShadow = "none";
+                  }
+                }}
+              >
+                {/* Thick Button Bevel Outline */}
+                <div style={{ position: "absolute", inset: "2px", background: "linear-gradient(180deg, rgba(20,20,20,0.95) 0%, rgba(5,5,5,0.98) 100%)", clipPath: "polygon(13px 0, calc(100% - 13px) 0, 100% 13px, 100% calc(100% - 13px), calc(100% - 13px) 100%, 13px 100%, 0 calc(100% - 13px), 0 13px)", zIndex: -1, transition: "opacity 0.4s", opacity: 0.9 }} />
+
+                {/* Sweep animation div */}
+                <motion.div
+                  initial={{ left: "-100%" }}
+                  animate={{ left: "200%" }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 1 }}
+                  style={{ position: "absolute", top: 0, width: "30%", height: "100%", background: "linear-gradient(90deg, transparent, rgba(212,175,55,0.6), transparent)", transform: "skewX(-20deg)", zIndex: 0 }}
+                />
+
+                <span style={{ position: "relative", zIndex: 1 }}>{registering ? "SYNCHRONIZING..." : "ENTER SANCTUM"}</span>
+              </button>
+            </motion.div>
+
           </form>
         </motion.div>
+        </motion.div>
+
       </div>
     </div>
   );
