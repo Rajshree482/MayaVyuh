@@ -280,18 +280,40 @@ app.delete('/api/admin/images/:id', async (req, res) => {
 
 app.post('/api/similarity', async (req, res) => {
   try {
-    const { original_url, submitted_url } = req.body;
-    const aiServiceUrl = process.env.AI_SERVICE_URL || "http://localhost:8000";
-    const response = await fetch(`${aiServiceUrl}/api/similarity`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ original_url, submitted_url })
+    const { teamId, original_url, submitted_url } = req.body;
+    const { execFile } = require('child_process');
+    const path = require('path');
+    
+    const scriptPath = path.join(__dirname, '../maya-ai-service/runner.py');
+    
+    execFile('python', [scriptPath, original_url, submitted_url], async (error, stdout, stderr) => {
+      if (error) {
+         console.error("AI Model error:", error, stderr);
+         return res.status(500).json({ error: "Scoring failed" });
+      }
+      try {
+        const data = JSON.parse(stdout);
+        
+        if (data.error) {
+           return res.status(500).json({ error: data.error });
+        }
+        
+        const score = data.similarity_score;
+        
+        if (teamId) {
+            await Team.findByIdAndUpdate(teamId, { 
+                score: score, 
+                finalImageUrl: submitted_url,
+                referenceImageUrl: original_url
+            });
+        }
+        
+        res.json(data);
+      } catch (e) {
+        console.error("Failed to parse AI output:", stdout);
+        res.status(500).json({ error: "Failed to parse AI output" });
+      }
     });
-    if (!response.ok) {
-      throw new Error(`AI service returned status: ${response.status}`);
-    }
-    const data = await response.json();
-    res.json(data);
   } catch (err) {
     console.error("Similarity Error:", err);
     res.status(500).json({ error: "Similarity scoring failed" });

@@ -373,6 +373,7 @@ const MayaNexusNav = ({ active, setActive }) => {
   const sections = [
     { id: "CORE", icon: <Cpu size={24} />, label: "DATACRON CORE" },
     { id: "TLM", icon: <Activity size={24} />, label: "TELEMETRY" },
+    { id: "LDB", icon: <BarChart3 size={24} />, label: "LEADERBOARD" },
     { id: "VAULT", icon: <Database size={24} />, label: "IMAGE VAULT" },
     { id: "OVR", icon: <AlertTriangle size={24} />, label: "OVERRIDES" }
   ];
@@ -487,6 +488,78 @@ const ImageVaultSection = () => {
           </div>
         )}
       </div>
+    </div>
+  );
+};
+
+const AdminLeaderboard = () => {
+  const [teams, setTeams] = useState([]);
+  const [selectedTeam, setSelectedTeam] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API}/api/admin/leaderboard`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setTeams(data.teams.filter(t => t.score > 0).sort((a, b) => b.score - a.score));
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  return (
+    <div className="imperial-glass imperial-panel" style={{ flex: 1, padding: 48, display: "flex", flexDirection: "column", position: "relative" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
+        <div style={{ fontFamily: "'Cinzel', serif", fontSize: 32, letterSpacing: 4 }} className="imperial-gold-text">FINAL LEADERBOARD</div>
+      </div>
+      
+      <div className="custom-scrollbar" style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 16 }}>
+        {teams.map((t, i) => (
+          <div key={t._id} onClick={() => setSelectedTeam(t)} style={{ display: "flex", alignItems: "center", gap: 24, padding: 24, background: i === 0 ? "rgba(212,175,55,0.15)" : "rgba(0,0,0,0.6)", border: i === 0 ? "1px solid rgba(212,175,55,0.8)" : "1px solid rgba(212,175,55,0.2)", cursor: "pointer", transition: "all 0.3s" }} onMouseOver={e => e.currentTarget.style.transform = "translateX(10px)"} onMouseOut={e => e.currentTarget.style.transform = "translateX(0)"}>
+            <div style={{ fontSize: 32, fontFamily: "'Cinzel', serif", color: i === 0 ? "#D4AF37" : "rgba(212,175,55,0.5)", width: 60, textAlign: "center" }}>#{i + 1}</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 24, fontFamily: "'Cinzel', serif", color: i === 0 ? "#D4AF37" : "#fff", letterSpacing: 2 }}>{t.name}</div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", letterSpacing: 2, marginTop: 4 }}>TEAM {t.teamNumber}</div>
+            </div>
+            <div style={{ fontSize: 36, fontFamily: "'Orbitron'", color: i === 0 ? "var(--neon-green)" : "var(--neon-cyan)", fontWeight: "bold" }}>
+              {t.score ? t.score.toFixed(1) + "%" : "0.0%"}
+            </div>
+          </div>
+        ))}
+        {teams.length === 0 && (
+          <div style={{ textAlign: "center", padding: 100, border: "1px dashed rgba(212, 175, 55, 0.2)", color: "rgba(212, 175, 55, 0.5)", fontSize: 14, letterSpacing: 4 }}>
+            NO SUBMISSIONS YET
+          </div>
+        )}
+      </div>
+
+      <AnimatePresence>
+        {selectedTeam && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.9)", backdropFilter: "blur(10px)", zIndex: 50, display: "flex", flexDirection: "column", padding: 48 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 40 }}>
+              <div>
+                <div style={{ fontSize: 32, fontFamily: "'Cinzel', serif", color: "#D4AF37", letterSpacing: 4 }}>{selectedTeam.name}</div>
+                <div style={{ fontSize: 14, color: "var(--neon-cyan)", letterSpacing: 2 }}>SIMILARITY: {selectedTeam.score?.toFixed(1)}%</div>
+              </div>
+              <button onClick={() => setSelectedTeam(null)} className="btn-imperial-danger" style={{ padding: "12px 32px", fontSize: 12 }}>CLOSE</button>
+            </div>
+            <div style={{ display: "flex", gap: 40, flex: 1, minHeight: 0 }}>
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", border: "1px solid rgba(212,175,55,0.3)", background: "rgba(0,0,0,0.5)", padding: 24 }}>
+                <div style={{ fontSize: 14, letterSpacing: 4, color: "#D4AF37", marginBottom: 24, textAlign: "center" }}>TARGET REFERENCE IMAGE</div>
+                <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {selectedTeam.referenceImageUrl ? <img src={selectedTeam.referenceImageUrl} alt="Reference" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} /> : <div style={{ color: "var(--text-dim)" }}>NO REFERENCE</div>}
+                </div>
+              </div>
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", border: "1px solid rgba(0,255,136,0.3)", background: "rgba(0,0,0,0.5)", padding: 24 }}>
+                <div style={{ fontSize: 14, letterSpacing: 4, color: "var(--neon-green)", marginBottom: 24, textAlign: "center" }}>FINAL SUBMITTED IMAGE</div>
+                <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {selectedTeam.finalImageUrl ? <img src={selectedTeam.finalImageUrl} alt="Submitted" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} /> : <div style={{ color: "var(--text-dim)" }}>NO SUBMISSION</div>}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
@@ -759,6 +832,13 @@ export const AdminDashboard = ({ teams, setTeams, eventState, setEventState }) =
         return (
           <motion.div key="vault" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.5 }} style={{ flex: 1, display: "flex", flexDirection: "column", padding: "48px 64px", minHeight: 750 }}>
             <ImageVaultSection />
+          </motion.div>
+        );
+
+      case "LDB":
+        return (
+          <motion.div key="ldb" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.5 }} style={{ flex: 1, display: "flex", flexDirection: "column", padding: "48px 64px", minHeight: 750 }}>
+            <AdminLeaderboard />
           </motion.div>
         );
 

@@ -15,7 +15,9 @@ const teamSchema = new mongoose.Schema({
   creatorText: String,
   tabSwitchCount: { type: Number, default: 0 },
   fullscreenExits: { type: Number, default: 0 },
-  warnings: { type: Number, default: 0 }
+  warnings: { type: Number, default: 0 },
+  referenceImageUrl: { type: String, default: null },
+  finalImageUrl: { type: String, default: null }
 });
 
 module.exports = mongoose.model('Team', teamSchema);

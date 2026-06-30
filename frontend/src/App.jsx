@@ -86,10 +86,9 @@ function useAntiCheat({ isPlayer, teamId, onDisqualify, isPaused, forceCloseWind
     // ----------------------------------------------------------
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        // Only flag if NOT the Gemini popup being interacted with
-        // (We can't know for sure, so we log it but don't block)
-        reportViolation("tab_switch");
-        document.body.classList.add("ac-focus-lost");
+        // [TEMPORARILY DISABLED]
+        // reportViolation("tab_switch");
+        // document.body.classList.add("ac-focus-lost");
       } else {
         document.body.classList.remove("ac-focus-lost");
       }
@@ -107,7 +106,8 @@ function useAntiCheat({ isPlayer, teamId, onDisqualify, isPaused, forceCloseWind
         const geminiAlive = geminiWin && !geminiWin.closed;
         // If Gemini popup is open and was just opened, don't flag
         if (!geminiAlive) {
-          document.body.classList.add("ac-focus-lost");
+          // [TEMPORARILY DISABLED]
+          // document.body.classList.add("ac-focus-lost");
         }
       }, 200);
     };
@@ -945,8 +945,8 @@ const RoundDisplay = ({ playerLabel, targetImage, onComplete, roundLabel, storag
   const effectivelyEnded = isRoundEnded || isTimeUp;
 
   useEffect(() => {
-    if (isPaused || effectivelyEnded) setIsGeminiLaunched(false);
-  }, [isPaused, effectivelyEnded]);
+    if (isPaused) setIsGeminiLaunched(false);
+  }, [isPaused]);
 
   const fmtTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
@@ -1062,7 +1062,7 @@ const RoundDisplay = ({ playerLabel, targetImage, onComplete, roundLabel, storag
               </div>
               <div style={{ display: "flex", gap: 16 }}>
                 <button className="btn-imperial-danger" style={{ flex: 1, padding: 16 }} onClick={() => setUploadedImgUrl(null)}>RETRY</button>
-                <button className="btn-imperial" style={{ flex: 2, padding: 16, borderColor: "var(--neon-green)", color: "var(--neon-green)", opacity: verifying ? 0.5 : 1 }} onClick={handleSubmit} disabled={verifying}>{verifying ? "VERIFYING..." : "SUBMIT TO DATACRON ➔"}</button>
+                <button className="btn-imperial" style={{ flex: 2, padding: 16, borderColor: (!effectivelyEnded ? "var(--text-dim)" : "var(--neon-green)"), color: (!effectivelyEnded ? "var(--text-dim)" : "var(--neon-green)"), opacity: (verifying || !effectivelyEnded) ? 0.5 : 1, cursor: !effectivelyEnded ? "not-allowed" : "pointer" }} onClick={effectivelyEnded ? handleSubmit : undefined} disabled={verifying || !effectivelyEnded}>{verifying ? "VERIFYING..." : (!effectivelyEnded ? "AWAITING ROUND END..." : "SUBMIT TO DATACRON ➔")}</button>
               </div>
             </motion.div>
           )}
@@ -1134,24 +1134,13 @@ const SelectionScreen = ({ imgR2, imgR3, onSelect }) => (
   </div>
 );
 
-const JudgmentScreen = ({ originalImg, finalImg, score, onFinish }) => {
-  const [timeLeft, setTimeLeft] = useState(5);
-
-  useEffect(() => {
-    if (timeLeft <= 0) {
-      onFinish();
-      return;
-    }
-    const t = setTimeout(() => setTimeLeft(prev => prev - 1), 1000);
-    return () => clearTimeout(t);
-  }, [timeLeft, onFinish]);
-
+const JudgmentScreen = ({ originalImg, finalImg, score }) => {
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, position: "relative", zIndex: 1 }}>
       <img src={gdgLogo} alt="GDG Logo" style={{ width: 80, marginBottom: 20 }} />
       <div className="title-primary" style={{ marginBottom: 20, color: "var(--neon-gold)", textShadow: "0 0 20px var(--neon-gold)", animation: "pulse 2s infinite" }}>SIMILARITY RESULTS</div>
       <div style={{ fontFamily: "'Orbitron'", color: "var(--neon-cyan)", fontSize: 24, marginBottom: 40, letterSpacing: 4 }}>
-        PROCEEDING IN {timeLeft}S
+        AWAITING FINAL VERDICT
       </div>
 
       <div style={{ display: "flex", gap: 60, alignItems: "center", width: "100%", maxWidth: 1200, perspective: 1000 }}>
@@ -1242,16 +1231,16 @@ const PlayerSection = ({ globalTeams, setGlobalTeams, eventState }) => {
     if (s === 'waiting' && phase !== 'lobby' && phase !== 'register') {
       setPhase("lobby");
     }
-    else if (s === 'round1_active' && phase !== 'r1') {
-      fetch(`${API}/api/target-image`)
+    else if (s === 'round1_active' && !['r1', 'interval1'].includes(phase)) {
+      fetch(`${API}/api/target-image?teamId=${myTeam.id}`)
         .then(r => r.json())
         .then(d => { setTargetImage(d.url); setPhase("r1"); })
         .catch(e => setPhase("r1"));
     }
-    else if (s === 'round2_active' && phase !== 'r2') {
+    else if (s === 'round2_active' && !['r2', 'wait_for_r3'].includes(phase)) {
       setPhase("r2");
     }
-    else if (s === 'round3_active' && phase !== 'r3') {
+    else if (s === 'round3_active' && !['r3', 'select', 'judgment'].includes(phase)) {
       setPhase("r3");
     }
     else if (s === 'finished' && phase !== 'leaderboard') {
@@ -1358,7 +1347,7 @@ const PlayerSection = ({ globalTeams, setGlobalTeams, eventState }) => {
     try {
       const res = await fetch(`${API}/api/similarity`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ original_url: targetImage, submitted_url: img })
+        body: JSON.stringify({ teamId: myTeam.id, original_url: targetImage, submitted_url: img })
       });
       const data = await res.json();
       const s = data.similarity_score || 0;
@@ -1370,7 +1359,7 @@ const PlayerSection = ({ globalTeams, setGlobalTeams, eventState }) => {
       updateTeamStatus({ round: 3, score: 0, finalImage: img });
     }
   }} />;
-  if (phase === "judgment") return <JudgmentScreen originalImg={targetImage} finalImg={finalImg} score={score} onFinish={() => setPhase("leaderboard")} />;
+  if (phase === "judgment") return <JudgmentScreen originalImg={targetImage} finalImg={finalImg} score={score} />;
   if (phase === "leaderboard") return <LeaderboardRedirect teams={globalTeams} />;
 
   return null;
