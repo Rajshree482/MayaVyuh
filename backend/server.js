@@ -292,7 +292,9 @@ app.post('/api/similarity', async (req, res) => {
          return res.status(500).json({ error: "Scoring failed" });
       }
       try {
-        const data = JSON.parse(stdout);
+        const jsonMatch = stdout.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) throw new Error("No JSON found in Python output");
+        const data = JSON.parse(jsonMatch[0]);
         
         if (data.error) {
            return res.status(500).json({ error: data.error });
@@ -306,6 +308,13 @@ app.post('/api/similarity', async (req, res) => {
                 finalImageUrl: submitted_url,
                 referenceImageUrl: original_url
             });
+            
+            const Submission = require('../models/Submission');
+            await Submission.findOneAndUpdate(
+                { team: teamId, round: 3 },
+                { similarityScore: score },
+                { sort: { timestamp: -1 } }
+            );
         }
         
         res.json(data);

@@ -24,12 +24,17 @@ def main():
         tmp1 = tempfile.NamedTemporaryFile(delete=False, suffix=".jpg")
         tmp2 = tempfile.NamedTemporaryFile(delete=False, suffix=".jpg")
         
+        import ssl
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        
         req1 = urllib.request.Request(url1, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req1) as response, open(tmp1.name, 'wb') as out_file:
+        with urllib.request.urlopen(req1, context=ctx) as response, open(tmp1.name, 'wb') as out_file:
             out_file.write(response.read())
             
         req2 = urllib.request.Request(url2, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req2) as response, open(tmp2.name, 'wb') as out_file:
+        with urllib.request.urlopen(req2, context=ctx) as response, open(tmp2.name, 'wb') as out_file:
             out_file.write(response.read())
             
         # Load model and compare
@@ -42,7 +47,9 @@ def main():
         print(json.dumps({"similarity_score": float(score)}))
         
     except Exception as e:
-        print(json.dumps({"error": str(e)}))
+        import traceback
+        error_details = "".join(traceback.format_exception(type(e), e, e.__traceback__))
+        print(json.dumps({"error": str(e), "traceback": error_details}))
         sys.exit(1)
     finally:
         # Cleanup temp files
